@@ -1,4 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using Newtonsoft.Json;
 
 namespace GeneratePerson
@@ -7,59 +14,103 @@ namespace GeneratePerson
     {
         static void Main(string[] args)
         {
-            Person p = new Person();
+            var p = new Person();
 
             Console.WriteLine(p.ToFormattedJson());
 
-            while (true) ;
+            Console.WriteLine(p.ToXml());
+
+            #if DEBUG
+                Console.WriteLine();
+                Console.WriteLine("Press enter to close...");
+                Console.ReadLine();
+            #endif
         }
     }
 
-    class Person
+    public class Person : IXmlSerializable
     {
-        bool IsMale { get; set; }
+        private bool IsMale { get; set; }
+
+        private Random Rnd { get; set; }
+
+        private List<string> _maleNames;
+
+        private List<string> _femaleNames;
+
+        private List<string> _familyNames;
 
         [JsonProperty]
-        string FirstName { get; set; }
+        private string FirstName { get; set; }
 
         [JsonProperty]
-        string LastName { get; set; }
+        private string LastName { get; set; }
 
         [JsonProperty]
-        DateTime BirthDate { get; set; }
+        private DateTime BirthDate { get; set; }
 
         [JsonProperty]
-        string SocialSecurityNumber { get; set; }
+        private string SocialSecurityNumber { get; set; }
 
         [JsonProperty]
-        string Address { get; set; }
+        private string Address { get; set; }
 
         [JsonProperty]
-        string City { get; set; }
+        private string City { get; set; }
 
         [JsonProperty]
-        string Zipcode { get; set; }
+        private string Zipcode { get; set; }
 
         [JsonProperty]
-        string Phone { get; set; }
+        private string Phone { get; set; }
 
         [JsonProperty]
-        string Email { get; set; }
+        private string Email { get; set; }
 
         public Person()
         {
             //generate a random person by calling functions to randomly generate each property.
+            Rnd = new Random();
+            LoadJson();
+
+            GenerateGender();
+            GenerateName();
+            GenerateBirthDate();
+            GenerateSocialSecurityNumber();
+            GenerateAddress();
+            GeneratePhone();
+            GenerateEmail();
+
         }
 
-        override public string ToString()
+        public override string ToString()
         {
-            //return string object of this instance
             return "";
+        }
+
+        private void LoadJson()
+        {
+            using (var r = new StreamReader("../../lists/swedish_male_names.json"))
+            {
+                var json = r.ReadToEnd();
+                _maleNames = JsonConvert.DeserializeObject<List<string>>(json);
+            }
+
+            using (var r = new StreamReader("../../lists/swedish_female_names.json"))
+            {
+                var json = r.ReadToEnd();
+                _femaleNames = JsonConvert.DeserializeObject<List<string>>(json);
+            }
+
+            using (var r = new StreamReader("../../lists/swedish_family_names.json"))
+            {
+                var json = r.ReadToEnd();
+                _familyNames = JsonConvert.DeserializeObject<List<string>>(json);
+            }
         }
 
         public string ToJson()
         {
-            // return jsonobject of this instance
             return JsonConvert.SerializeObject(this, new JsonSerializerSettings() { DateFormatString = "yyyy-MM-dd" });
         }
 
@@ -68,33 +119,72 @@ namespace GeneratePerson
             return JsonConvert.DeserializeObject(this.ToJson()).ToString();
         }
 
-        public void ToXml()
+        public string ToXml()
         {
-            //return xml of this instance
+            var x = new XmlSerializer(this.GetType());
+            using (var textWriter = new StringWriter())
+            {
+                x.Serialize(textWriter, this);
+                return textWriter.ToString();
+            }
         }
 
+        //sets the gender of the instance randomly
         protected void GenerateGender()
         {
-            //sets the gender of the instance randomly
-        }
-        protected void GenerateName(bool isMale)
-        {
-            //sets first and lastname of this instance randomly
+            if (Rnd.Next(100) > 49)
+                this.IsMale = true;
         }
 
+        //sets first and lastname of this instance randomly
+        // json-files containing names from https://github.com/bolddp/swedish-names
+        protected void GenerateName()
+        {
+            FirstName = IsMale ? _maleNames[Rnd.Next(_maleNames.Count)] : _femaleNames[Rnd.Next(_femaleNames.Count)];
+            LastName = _familyNames[Rnd.Next(_familyNames.Count)];
+        }
+
+        //generate random birthdate
         protected void GenerateBirthDate()
         {
-            //generate random birthdate
+            var startDate = new DateTime(1940,1,1);
+            var range = (DateTime.Today - startDate).Days;
+            BirthDate = startDate.AddDays(Rnd.Next(range));
         }
 
-        protected void GenerateSocialSecurityNumber(bool isMale, DateTime birthDate)
+        //generate random valid swedish socialsecuritynumber
+        protected void GenerateSocialSecurityNumber()
         {
-            //generate random socialsecuritynumber
+            var x = Rnd.Next(10);
+            if (IsMale && (x % 2 == 0))
+                x++;
+            else if (!IsMale && x % 2 != 0)
+                x--;
+
+            var ssno = BirthDate.Year.ToString().Substring(2,2) + BirthDate.Month.ToString().PadLeft(2, '0') +
+                          BirthDate.Day.ToString().PadLeft(2, '0') + Rnd.Next(100).ToString().PadLeft(2, '0') + x.ToString();
+
+            var total = "";
+
+            for (var i = 0; i < ssno.Length; ++i)
+            {
+                if (i % 2 == 0)
+                    total += ((int) char.GetNumericValue(ssno[i]) * 2).ToString();
+                else
+                    total += ssno[i];
+            }
+
+            var result = total.Sum(i => (int) char.GetNumericValue(i));
+
+            ssno += ((10-(result%10))%10).ToString();
+            
+            SocialSecurityNumber = ssno;
         }
 
+        //generate random address
         protected void GenerateAddress()
         {
-            //generate random address
+         
         }
 
         protected void GeneratePhone()
@@ -102,9 +192,38 @@ namespace GeneratePerson
             //generate random phone number
         }
         
-        protected void GenerateEmail(string firstName, string lastName)
+        protected void GenerateEmail()
         {
             //generate random email address
+            Email = FirstName.Replace(" ", "") + "." + LastName + "@" + "randomdomain" + ".se";
+        }
+
+        XmlSchema IXmlSerializable.GetSchema() { return null; }
+
+        void IXmlSerializable.ReadXml(XmlReader reader)
+        {
+            this.FirstName = reader.ReadElementString("FirstName");
+            this.LastName = reader.ReadElementString("LastName");
+            this.BirthDate = DateTime.ParseExact(reader.ReadElementString("BirthDate"), "yyyy-MM-dd", null);
+            this.SocialSecurityNumber = reader.ReadElementString("SocialSecurityNumber");
+            this.Address = reader.ReadElementString("Address");
+            this.City = reader.ReadElementString("City");
+            this.Zipcode = reader.ReadElementString("Zipcode");
+            this.Phone = reader.ReadElementString("Phone");
+            this.Email = reader.ReadElementString("Email");
+        }
+
+        void IXmlSerializable.WriteXml(XmlWriter writer)
+        {
+            writer.WriteElementString("FirstName", this.FirstName);
+            writer.WriteElementString("LastName", this.LastName);
+            writer.WriteElementString("BirthDate", this.BirthDate.ToString("yyyy-MM-dd"));
+            writer.WriteElementString("SocialSecurityNumber", this.SocialSecurityNumber);
+            writer.WriteElementString("Address", this.Address);
+            writer.WriteElementString("City", this.City);
+            writer.WriteElementString("Zipcode", this.Zipcode);
+            writer.WriteElementString("Phone", this.Phone);
+            writer.WriteElementString("Email", this.Email);
         }
     }
 }

@@ -16,8 +16,7 @@ namespace GeneratePerson
     }
 
     class Person
-    {   
-        [JsonProperty]
+    {
         bool IsMale { get; set; }
 
         [JsonProperty]

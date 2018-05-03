@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace GeneratePerson
 {
@@ -12,21 +9,42 @@ namespace GeneratePerson
         {
             Person p = new Person();
 
+            Console.WriteLine(p.ToFormattedJson());
+
             while (true) ;
         }
     }
 
     class Person
-    {
+    {   
+        [JsonProperty]
         bool IsMale { get; set; }
+
+        [JsonProperty]
         string FirstName { get; set; }
+
+        [JsonProperty]
         string LastName { get; set; }
+
+        [JsonProperty]
         DateTime BirthDate { get; set; }
+
+        [JsonProperty]
         string SocialSecurityNumber { get; set; }
+
+        [JsonProperty]
         string Address { get; set; }
+
+        [JsonProperty]
         string City { get; set; }
+
+        [JsonProperty]
         string Zipcode { get; set; }
+
+        [JsonProperty]
         string Phone { get; set; }
+
+        [JsonProperty]
         string Email { get; set; }
 
         public Person()
@@ -40,9 +58,15 @@ namespace GeneratePerson
             return "";
         }
 
-        public void ToJson()
+        public string ToJson()
         {
             // return jsonobject of this instance
+            return JsonConvert.SerializeObject(this, new JsonSerializerSettings() { DateFormatString = "yyyy-MM-dd" });
+        }
+
+        public string ToFormattedJson()
+        {
+            return JsonConvert.DeserializeObject(this.ToJson()).ToString();
         }
 
         public void ToXml()

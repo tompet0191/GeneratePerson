@@ -54,7 +54,7 @@ namespace GeneratePerson
         {
             //sets the gender of the instance randomly
         }
-        protected void GenerateName()
+        protected void GenerateName(bool isMale)
         {
             //sets first and lastname of this instance randomly
         }
@@ -79,7 +79,7 @@ namespace GeneratePerson
             //generate random phone number
         }
         
-        protected void GenerateEmail()
+        protected void GenerateEmail(string firstName, string lastName)
         {
             //generate random email address
         }

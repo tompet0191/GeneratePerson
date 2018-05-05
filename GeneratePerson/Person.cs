@@ -13,7 +13,7 @@ namespace GeneratePerson
     {
         private bool IsMale { get; set; }
 
-        private Random Rnd { get; set; }
+        private Random Rnd { get; }
 
         private List<string> _maleNames;
 
@@ -156,7 +156,7 @@ namespace GeneratePerson
                 x--;
 
             var ssno = BirthDate.Year.ToString().Substring(2, 2) + BirthDate.Month.ToString().PadLeft(2, '0') +
-                          BirthDate.Day.ToString().PadLeft(2, '0') + Rnd.Next(100).ToString().PadLeft(2, '0') + x.ToString();
+                          BirthDate.Day.ToString().PadLeft(2, '0') + Rnd.Next(100).ToString().PadLeft(2, '0') + x;
 
             var total = "";
 
@@ -178,7 +178,8 @@ namespace GeneratePerson
         //generate random address
         protected void GenerateAddress()
         {
-
+            //prefix ["Mönster","Drottning","Kungs","Ny","Gammel","Lingon","Oskar","Kulla","Regerings","Norrlands","Skåne","Dala","Stock","Gryning","Hallon","Gotlands","Professor","Skräddar","Präst","Kammar","Kyrko","Timmer","Stor","Industri","Riddar","Ulvsunda","Strand","Ankar","Bastu","Balders", "Biblioteks","Brunns","Ersta","Guld","Karla","Körsbärs", "Malm","Ring","Stall","Vinter"]
+            //postfix ["stigen","vägen","slingan","gatan","gränd"]
         }
 
         protected void GeneratePhone()
@@ -196,28 +197,28 @@ namespace GeneratePerson
 
         void IXmlSerializable.ReadXml(XmlReader reader)
         {
-            this.FirstName = reader.ReadElementString("FirstName");
-            this.LastName = reader.ReadElementString("LastName");
-            this.BirthDate = DateTime.ParseExact(reader.ReadElementString("BirthDate"), "yyyy-MM-dd", null);
-            this.SocialSecurityNumber = reader.ReadElementString("SocialSecurityNumber");
-            this.Address = reader.ReadElementString("Address");
-            this.City = reader.ReadElementString("City");
-            this.Zipcode = reader.ReadElementString("Zipcode");
-            this.Phone = reader.ReadElementString("Phone");
-            this.Email = reader.ReadElementString("Email");
+            FirstName = reader.ReadElementString("FirstName");
+            LastName = reader.ReadElementString("LastName");
+            BirthDate = DateTime.ParseExact(reader.ReadElementString("BirthDate"), "yyyy-MM-dd", null);
+            SocialSecurityNumber = reader.ReadElementString("SocialSecurityNumber");
+            Address = reader.ReadElementString("Address");
+            City = reader.ReadElementString("City");
+            Zipcode = reader.ReadElementString("Zipcode");
+            Phone = reader.ReadElementString("Phone");
+            Email = reader.ReadElementString("Email");
         }
 
         void IXmlSerializable.WriteXml(XmlWriter writer)
         {
-            writer.WriteElementString("FirstName", this.FirstName);
-            writer.WriteElementString("LastName", this.LastName);
-            writer.WriteElementString("BirthDate", this.BirthDate.ToString("yyyy-MM-dd"));
-            writer.WriteElementString("SocialSecurityNumber", this.SocialSecurityNumber);
-            writer.WriteElementString("Address", this.Address);
-            writer.WriteElementString("City", this.City);
-            writer.WriteElementString("Zipcode", this.Zipcode);
-            writer.WriteElementString("Phone", this.Phone);
-            writer.WriteElementString("Email", this.Email);
+            writer.WriteElementString("FirstName", FirstName);
+            writer.WriteElementString("LastName", LastName);
+            writer.WriteElementString("BirthDate", BirthDate.ToString("yyyy-MM-dd"));
+            writer.WriteElementString("SocialSecurityNumber", SocialSecurityNumber);
+            writer.WriteElementString("Address", Address);
+            writer.WriteElementString("City", City);
+            writer.WriteElementString("Zipcode", Zipcode);
+            writer.WriteElementString("Phone", Phone);
+            writer.WriteElementString("Email", Email);
         }
     }
 }

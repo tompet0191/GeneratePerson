@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Text;
 
 namespace GeneratePerson
 {
     class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var p = new Person();
 

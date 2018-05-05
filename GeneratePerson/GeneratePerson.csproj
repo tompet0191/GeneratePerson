@@ -51,6 +51,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="lists\swedish_family_names.json" />
+    <None Include="lists\swedish_female_names.json" />
+    <None Include="lists\swedish_male_names.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

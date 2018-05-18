@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 namespace GeneratePerson
 {
 
-    
     public class Person : IXmlSerializable
     {
         private bool IsMale { get; set; }
@@ -52,6 +51,12 @@ namespace GeneratePerson
         [JsonProperty]
         private string Email { get; set; }
 
+        private class PostCode
+        {
+            public string Zip { get; set; }
+            public string City { get; set; }
+        }
+
         public Person()
         {
             Rnd = new Random();
@@ -91,8 +96,7 @@ namespace GeneratePerson
             using (var r = new StreamReader("../../lists/swedish_male_names.json"))
             {
                 var json = r.ReadToEnd();
-                _maleNames = JsonConvert.DeserializeObject<List<string>>(json, new JsonSerializerSettings()
-                { Culture = new System.Globalization.CultureInfo("sv-SE") });
+                _maleNames = JsonConvert.DeserializeObject<List<string>>(json);
             }
 
             using (var r = new StreamReader("../../lists/swedish_female_names.json"))
@@ -110,9 +114,7 @@ namespace GeneratePerson
             using (var r = new StreamReader("../../lists/postcodes.json"))
             {
                 var json = r.ReadToEnd();
-                _postCodes = JsonConvert.DeserializeObject<List<PostCode>>(json, new JsonSerializerSettings()
-                { Culture = new System.Globalization.CultureInfo("sv-SE") });
-                //_postCodes = JsonConvert.DeserializeObject<List<string>>(json);
+                _postCodes = JsonConvert.DeserializeObject<List<PostCode>>(json);
             }
         }
 

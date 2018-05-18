@@ -13,6 +13,7 @@ namespace GeneratePerson
 
             Console.WriteLine(p.ToXml());
 
+            
             #if DEBUG
                 Console.WriteLine();
                 Console.WriteLine("Press enter to close...");

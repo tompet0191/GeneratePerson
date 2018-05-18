@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 
 namespace GeneratePerson
 {
+
+    
     public class Person : IXmlSerializable
     {
         private bool IsMale { get; set; }
@@ -20,6 +22,8 @@ namespace GeneratePerson
         private List<string> _femaleNames;
 
         private List<string> _familyNames;
+
+        private List<PostCode> _postCodes;
 
         [JsonProperty]
         private string FirstName { get; set; }
@@ -87,7 +91,8 @@ namespace GeneratePerson
             using (var r = new StreamReader("../../lists/swedish_male_names.json"))
             {
                 var json = r.ReadToEnd();
-                _maleNames = JsonConvert.DeserializeObject<List<string>>(json);
+                _maleNames = JsonConvert.DeserializeObject<List<string>>(json, new JsonSerializerSettings()
+                { Culture = new System.Globalization.CultureInfo("sv-SE") });
             }
 
             using (var r = new StreamReader("../../lists/swedish_female_names.json"))
@@ -100,6 +105,14 @@ namespace GeneratePerson
             {
                 var json = r.ReadToEnd();
                 _familyNames = JsonConvert.DeserializeObject<List<string>>(json);
+            }
+
+            using (var r = new StreamReader("../../lists/postcodes.json"))
+            {
+                var json = r.ReadToEnd();
+                _postCodes = JsonConvert.DeserializeObject<List<PostCode>>(json, new JsonSerializerSettings()
+                { Culture = new System.Globalization.CultureInfo("sv-SE") });
+                //_postCodes = JsonConvert.DeserializeObject<List<string>>(json);
             }
         }
 
@@ -178,13 +191,28 @@ namespace GeneratePerson
         //generate random address
         protected void GenerateAddress()
         {
-            //prefix ["Mönster","Drottning","Kungs","Ny","Gammel","Lingon","Oskar","Kulla","Regerings","Norrlands","Skåne","Dala","Stock","Gryning","Hallon","Gotlands","Professor","Skräddar","Präst","Kammar","Kyrko","Timmer","Stor","Industri","Riddar","Ulvsunda","Strand","Ankar","Bastu","Balders", "Biblioteks","Brunns","Ersta","Guld","Karla","Körsbärs", "Malm","Ring","Stall","Vinter"]
-            //postfix ["stigen","vägen","slingan","gatan","gränd"]
+            string[] prefix = new string[] { "Mönster", "Drottning", "Kungs", "Ny", "Gammel", "Lingon", "Oskar", "Kulla", "Regerings", "Norrlands", "Skåne", "Dala", "Stock", "Gryning", "Hallon", "Gotlands", "Professor", "Skräddar", "Präst", "Kammar", "Kyrko", "Timmer", "Stor", "Industri", "Riddar", "Ulvsunda", "Strand", "Ankar", "Bastu", "Balders", "Biblioteks", "Brunns", "Ersta", "Guld", "Karla", "Körsbärs", "Malm", "Ring", "Stall", "Vinter" };
+            string[] postfix = new string[] { "stigen", "vägen", "slingan", "gatan", "gränd" };
+
+            Address = prefix[Rnd.Next(prefix.Length)] + postfix[Rnd.Next(postfix.Length)] + " " + Rnd.Next(100);
+
+            //Gets first 2 numbers in zipcode which also determines the city
+            var randPostcode = _postCodes[Rnd.Next(_postCodes.Count)];
+            City = randPostcode.City;
+            Zipcode = randPostcode.Zip;
+
+            //Gets third number, for street address
+            char[] thirdNumber = new char[] { '2', '3', '4', '6', '7' };
+            Zipcode += thirdNumber[Rnd.Next(thirdNumber.Length)];
+
+            //Gets final numbers
+            Zipcode += " " + Rnd.Next(100).ToString().PadLeft(2, '0'); //rand 00-99
         }
 
         protected void GeneratePhone()
         {
             //generate random phone number
+            Phone = "070-" + Rnd.Next(1000).ToString().PadLeft(3, '0') + " " + Rnd.Next(100).ToString().PadLeft(2, '0') + " " + Rnd.Next(100).ToString().PadLeft(2, '0');
         }
 
         protected void GenerateEmail()

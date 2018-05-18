@@ -46,11 +46,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Person.cs" />
+    <Compile Include="PostCode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="lists\postcodes.json" />
     <None Include="lists\swedish_family_names.json" />
     <None Include="lists\swedish_female_names.json" />
     <None Include="lists\swedish_male_names.json" />

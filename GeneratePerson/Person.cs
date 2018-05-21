@@ -6,6 +6,8 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
+using System.Text;
+using System.Globalization;
 
 namespace GeneratePerson
 {
@@ -146,7 +148,7 @@ namespace GeneratePerson
         }
 
         //sets first and lastname of this instance randomly
-        // json-files containing names from https://github.com/bolddp/swedish-names
+        // json-files containing (a subset of) names from https://github.com/bolddp/swedish-names
         protected void GenerateName()
         {
             FirstName = IsMale ? _maleNames[Rnd.Next(_maleNames.Count)] : _femaleNames[Rnd.Next(_femaleNames.Count)];
@@ -156,6 +158,7 @@ namespace GeneratePerson
         //generate random birthdate
         protected void GenerateBirthDate()
         {
+            //TODO generate over 18?
             var startDate = new DateTime(1940, 1, 1);
             var range = (DateTime.Today - startDate).Days;
             BirthDate = startDate.AddDays(Rnd.Next(range));
@@ -164,6 +167,8 @@ namespace GeneratePerson
         //generate random valid swedish socialsecuritynumber
         protected void GenerateSocialSecurityNumber()
         {
+            //TODO - add 19/20 to year of birth. (not needed when calculating validity, so can be added last)
+
             var x = Rnd.Next(10);
             if (IsMale && (x % 2 == 0))
                 x++;
@@ -219,8 +224,29 @@ namespace GeneratePerson
 
         protected void GenerateEmail()
         {
+            var domains = new string[] { "whyspam.me", "trash-mail.com", "tempemail.com", "spamcowboy.com", "SendSpamHere.com", "sogetthis.com", "netmails.net", "keepmymail.com", "hatespam.org", "iheartspam.org", "fastmazda.com", "discardmail.com", "10minutemail.com", "4warding.net", "deadaddress.com" };
+
             //generate random email address
-            Email = FirstName.Replace(" ", "") + "." + LastName + "@" + "randomdomain" + ".se";
+            Email = RemoveDiacretics(FirstName).Replace(" ", "") + "." + RemoveDiacretics(LastName).Replace(" ", "") + "@" + domains[Rnd.Next(domains.Length)];
+        }
+
+        protected string GetFormattedName()
+        {
+            return FirstName + " " + LastName;
+        }
+
+        protected string RemoveDiacretics(string s)
+        {
+            s = s.Normalize(NormalizationForm.FormD);
+            var sb = new StringBuilder();
+
+            foreach (var c in s)
+            {
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                    sb.Append(c);
+            }
+
+            return sb.ToString();
         }
 
         XmlSchema IXmlSerializable.GetSchema() { return null; }

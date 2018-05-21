@@ -144,7 +144,7 @@ namespace GeneratePerson
         protected void GenerateGender()
         {
             if (Rnd.Next(100) > 49)
-                this.IsMale = true;
+                IsMale = true;
         }
 
         //sets first and lastname of this instance randomly
@@ -178,17 +178,17 @@ namespace GeneratePerson
             var ssno = BirthDate.Year.ToString().Substring(2, 2) + BirthDate.Month.ToString().PadLeft(2, '0') +
                           BirthDate.Day.ToString().PadLeft(2, '0') + Rnd.Next(100).ToString().PadLeft(2, '0') + x;
 
-            var total = "";
+            var sb = new StringBuilder();
 
             for (var i = 0; i < ssno.Length; ++i)
             {
                 if (i % 2 == 0)
-                    total += ((int)char.GetNumericValue(ssno[i]) * 2).ToString();
+                    sb.Append( ((int)char.GetNumericValue(ssno[i]) * 2).ToString() );
                 else
-                    total += ssno[i];
+                    sb.Append(ssno[i]);
             }
 
-            var result = total.Sum(i => (int)char.GetNumericValue(i));
+            var result = sb.ToString().Sum(i => (int)char.GetNumericValue(i));
 
             ssno += ((10 - (result % 10)) % 10).ToString();
 
@@ -198,8 +198,8 @@ namespace GeneratePerson
         //generate random address
         protected void GenerateAddress()
         {
-            string[] prefix = new string[] { "Mönster", "Drottning", "Kungs", "Ny", "Gammel", "Lingon", "Oskar", "Kulla", "Regerings", "Norrlands", "Skåne", "Dala", "Stock", "Gryning", "Hallon", "Gotlands", "Professor", "Skräddar", "Präst", "Kammar", "Kyrko", "Timmer", "Stor", "Industri", "Riddar", "Ulvsunda", "Strand", "Ankar", "Bastu", "Balders", "Biblioteks", "Brunns", "Ersta", "Guld", "Karla", "Körsbärs", "Malm", "Ring", "Stall", "Vinter" };
-            string[] postfix = new string[] { "stigen", "vägen", "slingan", "gatan", "gränd" };
+            var prefix = new string[] { "Mönster", "Drottning", "Kungs", "Ny", "Gammel", "Lingon", "Oskar", "Kulla", "Regerings", "Norrlands", "Skåne", "Dala", "Stock", "Gryning", "Hallon", "Gotlands", "Professor", "Skräddar", "Präst", "Kammar", "Kyrko", "Timmer", "Stor", "Industri", "Riddar", "Ulvsunda", "Strand", "Ankar", "Bastu", "Balders", "Biblioteks", "Brunns", "Ersta", "Guld", "Karla", "Körsbärs", "Malm", "Ring", "Stall", "Vinter" };
+            var postfix = new string[] { "stigen", "vägen", "slingan", "gatan", "gränd" };
 
             Address = prefix[Rnd.Next(prefix.Length)] + postfix[Rnd.Next(postfix.Length)] + " " + Rnd.Next(100);
 
@@ -209,7 +209,7 @@ namespace GeneratePerson
             Zipcode = randPostcode.Zip;
 
             //Gets third number, for street address
-            char[] thirdNumber = new char[] { '2', '3', '4', '6', '7' };
+            var thirdNumber = new char[] { '2', '3', '4', '6', '7' };
             Zipcode += thirdNumber[Rnd.Next(thirdNumber.Length)];
 
             //Gets final numbers

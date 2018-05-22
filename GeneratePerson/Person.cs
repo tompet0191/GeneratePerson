@@ -27,31 +27,31 @@ namespace GeneratePerson
         private List<PostCode> _postCodes;
 
         [JsonProperty]
-        private string FirstName { get; set; }
+        public string FirstName { get; set; }
 
         [JsonProperty]
-        private string LastName { get; set; }
+        public string LastName { get; set; }
 
         [JsonProperty]
-        private DateTime BirthDate { get; set; }
+        public DateTime BirthDate { get; set; }
 
         [JsonProperty]
-        private string SocialSecurityNumber { get; set; }
+        public string SocialSecurityNumber { get; set; }
 
         [JsonProperty]
-        private string Address { get; set; }
+        public string Address { get; set; }
 
         [JsonProperty]
-        private string City { get; set; }
+        public string City { get; set; }
 
         [JsonProperty]
-        private string Zipcode { get; set; }
+        public string Zipcode { get; set; }
 
         [JsonProperty]
-        private string Phone { get; set; }
+        public string Phone { get; set; }
 
         [JsonProperty]
-        private string Email { get; set; }
+        public string Email { get; set; }
 
         private class PostCode
         {
@@ -66,7 +66,7 @@ namespace GeneratePerson
 
             GenerateGender();
             GenerateName();
-            GenerateBirthDate();
+            GenerateBirthDate(false);
             GenerateSocialSecurityNumber();
             GenerateAddress();
             GeneratePhone();
@@ -74,14 +74,40 @@ namespace GeneratePerson
 
         }
 
-        public Person(bool isMale)
+        public Person(bool? isMale)
         {
-            IsMale = isMale;
             Rnd = new Random();
+
+            if (!isMale.HasValue)
+                GenerateGender();
+            else
+                IsMale = (bool) isMale;
+            
             LoadJson();
 
             GenerateName();
-            GenerateBirthDate();
+            GenerateBirthDate(false);
+            GenerateSocialSecurityNumber();
+            GenerateAddress();
+            GeneratePhone();
+            GenerateEmail();
+        }
+
+        public Person(bool? isMale, bool? generateOver18)
+        {
+            Rnd = new Random();
+
+            if (!isMale.HasValue)
+                GenerateGender();
+            else
+                IsMale = (bool)isMale;
+
+            bool over18 = (!generateOver18.HasValue) ? false : (bool) generateOver18;
+
+            LoadJson();
+
+            GenerateName();
+            GenerateBirthDate(over18);
             GenerateSocialSecurityNumber();
             GenerateAddress();
             GeneratePhone();
@@ -148,7 +174,6 @@ namespace GeneratePerson
         }
 
         //sets first and lastname of this instance randomly
-        // json-files containing (a subset of) names from https://github.com/bolddp/swedish-names
         protected void GenerateName()
         {
             FirstName = IsMale ? _maleNames[Rnd.Next(_maleNames.Count)] : _femaleNames[Rnd.Next(_femaleNames.Count)];
@@ -156,19 +181,17 @@ namespace GeneratePerson
         }
 
         //generate random birthdate
-        protected void GenerateBirthDate()
+        protected void GenerateBirthDate(bool over18)
         {
-            //TODO generate over 18?
             var startDate = new DateTime(1940, 1, 1);
-            var range = (DateTime.Today - startDate).Days;
+            var range = (over18) ? (DateTime.Today.AddYears(-18) - startDate).Days : (DateTime.Today - startDate).Days;
+
             BirthDate = startDate.AddDays(Rnd.Next(range));
         }
 
         //generate random valid swedish socialsecuritynumber
         protected void GenerateSocialSecurityNumber()
         {
-            //TODO - add 19/20 to year of birth. (not needed when calculating validity, so can be added last)
-
             var x = Rnd.Next(10);
             if (IsMale && (x % 2 == 0))
                 x++;
@@ -191,7 +214,7 @@ namespace GeneratePerson
             var result = sb.ToString().Sum(i => (int)char.GetNumericValue(i));
 
             ssno += ((10 - (result % 10)) % 10).ToString();
-
+            
             SocialSecurityNumber = ssno;
         }
 
@@ -224,7 +247,7 @@ namespace GeneratePerson
 
         protected void GenerateEmail()
         {
-            var domains = new string[] { "whyspam.me", "trash-mail.com", "tempemail.com", "spamcowboy.com", "SendSpamHere.com", "sogetthis.com", "netmails.net", "keepmymail.com", "hatespam.org", "iheartspam.org", "fastmazda.com", "discardmail.com", "10minutemail.com", "4warding.net", "deadaddress.com" };
+            var domains = new string[] { "whyspam.me", "trash-mail.com", "tempemail.com", "spamcowboy.com", "sendspamhere.com", "sogetthis.com", "netmails.net", "keepmymail.com", "hatespam.org", "iheartspam.org", "fastmazda.com", "discardmail.com", "10minutemail.com", "4warding.net", "deadaddress.com" };
 
             //generate random email address
             Email = RemoveDiacretics(FirstName).Replace(" ", "") + "." + RemoveDiacretics(LastName).Replace(" ", "") + "@" + domains[Rnd.Next(domains.Length)];

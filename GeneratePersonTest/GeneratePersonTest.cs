@@ -59,7 +59,7 @@ namespace GeneratePersonTest
             foreach(var pin in pins)
             {
                 Assert.That( FixPinFormat(pin), Is.True );
-                Assert.That( CheckPIN(pin), Is.True );
+                Assert.That( CheckPin(pin), Is.True );
             }
         }
 
@@ -73,7 +73,7 @@ namespace GeneratePersonTest
             return r3.IsMatch(str);
         }
 
-        private static bool CheckPIN(string str)
+        private static bool CheckPin(string str)
         {
             var sum = 0;
             for (var x = 9; x >= 0; x--)

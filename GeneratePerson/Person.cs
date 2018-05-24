@@ -26,6 +26,8 @@ namespace GeneratePerson
 
         private List<PostCode> _postCodes;
 
+        private string WorkDir { get; }
+
         [JsonProperty]
         public string FirstName { get; set; }
 
@@ -53,13 +55,12 @@ namespace GeneratePerson
         [JsonProperty]
         public string Email { get; set; }
 
-        private string WorkDir { get; set; }
-
         private class PostCode
         {
             public string Zip { get; set; }
             public string City { get; set; }
         }
+
 
         public Person()
         {
@@ -113,7 +114,7 @@ namespace GeneratePerson
             else
                 IsMale = (bool)isMale;
 
-            bool over18 = (!generateOver18.HasValue) ? false : (bool) generateOver18;
+            var over18 = (generateOver18.HasValue) && (bool) generateOver18;
 
             LoadJson();
 
@@ -233,8 +234,8 @@ namespace GeneratePerson
         //generate random address
         public void GenerateAddress()
         {
-            var prefix = new string[] { "Mönster", "Drottning", "Kungs", "Ny", "Gammel", "Lingon", "Oskar", "Kulla", "Regerings", "Norrlands", "Skåne", "Dala", "Stock", "Gryning", "Hallon", "Gotlands", "Professor", "Skräddar", "Präst", "Kammar", "Kyrko", "Timmer", "Stor", "Industri", "Riddar", "Ulvsunda", "Strand", "Ankar", "Bastu", "Balders", "Biblioteks", "Brunns", "Ersta", "Guld", "Karla", "Körsbärs", "Malm", "Ring", "Stall", "Vinter" };
-            var postfix = new string[] { "stigen", "vägen", "slingan", "gatan", "gränd" };
+            var prefix = new[] { "Mönster", "Drottning", "Kungs", "Ny", "Gammel", "Lingon", "Oskar", "Kulla", "Regerings", "Norrlands", "Skåne", "Dala", "Stock", "Gryning", "Hallon", "Gotlands", "Professor", "Skräddar", "Präst", "Kammar", "Kyrko", "Timmer", "Stor", "Industri", "Riddar", "Ulvsunda", "Strand", "Ankar", "Bastu", "Balders", "Biblioteks", "Brunns", "Ersta", "Guld", "Karla", "Körsbärs", "Malm", "Ring", "Stall", "Vinter" };
+            var postfix = new[] { "stigen", "vägen", "slingan", "gatan", "gränd" };
 
             Address = prefix[Rnd.Next(prefix.Length)] + postfix[Rnd.Next(postfix.Length)] + " " + Rnd.Next(100);
 
@@ -244,7 +245,7 @@ namespace GeneratePerson
             Zipcode = randPostcode.Zip;
 
             //Gets third number, for street address
-            var thirdNumber = new char[] { '2', '3', '4', '6', '7' };
+            var thirdNumber = new[] { '2', '3', '4', '6', '7' };
             Zipcode += thirdNumber[Rnd.Next(thirdNumber.Length)];
 
             //Gets final numbers
@@ -259,7 +260,7 @@ namespace GeneratePerson
 
         public void GenerateEmail()
         {
-            var domains = new string[] { "whyspam.me", "trash-mail.com", "tempemail.com", "spamcowboy.com", "sendspamhere.com", "sogetthis.com", "netmails.net", "keepmymail.com", "hatespam.org", "iheartspam.org", "fastmazda.com", "discardmail.com", "10minutemail.com", "4warding.net", "deadaddress.com" };
+            var domains = new[] { "whyspam.me", "trash-mail.com", "tempemail.com", "spamcowboy.com", "sendspamhere.com", "sogetthis.com", "netmails.net", "keepmymail.com", "hatespam.org", "iheartspam.org", "fastmazda.com", "discardmail.com", "10minutemail.com", "4warding.net", "deadaddress.com" };
 
             //generate random email address
             Email = RemoveDiacretics(FirstName).Replace(" ", "") + "." + RemoveDiacretics(LastName).Replace(" ", "") + "@" + domains[Rnd.Next(domains.Length)];

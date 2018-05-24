@@ -24,7 +24,7 @@ namespace GeneratePersonTest
         {
             var birthdates = new List<DateTime>();
 
-            for (int x = 0; x < 100000; ++x)
+            for (var x = 0; x < 100000; ++x)
             {
                 TestPerson.GenerateBirthDate(true);
 
@@ -33,7 +33,7 @@ namespace GeneratePersonTest
 
             foreach (var bd in birthdates)
             {
-                int age = DateTime.Now.Year - bd.Year;
+                var age = DateTime.Now.Year - bd.Year;
                 if ((DateTime.Now.DayOfYear < bd.DayOfYear) && age <= 18)
                     age--;
 
@@ -42,61 +42,60 @@ namespace GeneratePersonTest
         }
 
         [Test]
-        public void ShouldGenerateCorrectPIN()
+        public void ShouldGenerateCorrectPin()
         {
-            var PINs = new List<string>();
+            var pins = new List<string>();
 
             
-            for (int x = 0; x < 100000; ++x)
+            for (var x = 0; x < 100000; ++x)
             {
                 TestPerson.GenerateGender();
                 TestPerson.GenerateBirthDate(false);
                 TestPerson.GenerateSocialSecurityNumber();
 
-                PINs.Add(TestPerson.SocialSecurityNumber);
+                pins.Add(TestPerson.SocialSecurityNumber);
             }
 
-            foreach(var pin in PINs)
+            foreach(var pin in pins)
             {
-                Assert.That( FixPINformat(pin), Is.True );
+                Assert.That( FixPinFormat(pin), Is.True );
                 Assert.That( CheckPIN(pin), Is.True );
             }
         }
 
-        private static bool FixPINformat(string str)
+        private static bool FixPinFormat(string str)
         {
             var r = new Regex("[^0-9]");
             var r3 = new Regex(@"^\d{10}$");
 
             str = r.Replace(str, "");
 
-            return (!r3.IsMatch(str)) ? false : true;
+            return r3.IsMatch(str);
         }
 
         private static bool CheckPIN(string str)
         {
-            int sum = 0;
-            for (int x = 9; x >= 0; x--)
+            var sum = 0;
+            for (var x = 9; x >= 0; x--)
             {
                 if (x % 2 == 1)
-                    sum += (int)Char.GetNumericValue(str[x]);
+                    sum += (int)char.GetNumericValue(str[x]);
                 else
                 {
 
-                    int y = (int)Char.GetNumericValue(str[x]) * 2;
+                    var y = (int)char.GetNumericValue(str[x]) * 2;
                     if (y > 9)
                     {
-                        int[] list = y.ToString().Select(w => (int)Char.GetNumericValue(w)).ToArray();
+                        var list = y.ToString().Select(w => (int)char.GetNumericValue(w)).ToArray();
 
-                        foreach (int i in list)
-                            sum += i;
+                        sum += list.Sum();
                     }
                     else
-                        sum += (int)Char.GetNumericValue(str[x]) * 2;
+                        sum += (int)char.GetNumericValue(str[x]) * 2;
                 }
 
             }
-            return ((sum % 10) == 0);
+            return sum % 10 == 0;
         }
 
         [TearDown]

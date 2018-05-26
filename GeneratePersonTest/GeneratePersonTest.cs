@@ -22,19 +22,13 @@ namespace GeneratePersonTest
         [Test]
         public void ShouldGeneratePersonOver18()
         {
-            var birthdates = new List<DateTime>();
-
             for (var x = 0; x < 100000; ++x)
             {
                 TestPerson.GenerateBirthDate(true);
+                var birthDate = TestPerson.BirthDate;
 
-                birthdates.Add(TestPerson.BirthDate);
-            }
-
-            foreach (var bd in birthdates)
-            {
-                var age = DateTime.Now.Year - bd.Year;
-                if ((DateTime.Now.DayOfYear < bd.DayOfYear) && age <= 18)
+                var age = DateTime.Now.Year - birthDate.Year;
+                if ((DateTime.Now.DayOfYear < birthDate.DayOfYear) && age <= 18)
                     age--;
 
                 Assert.That(age, Is.AtLeast(18));
@@ -44,22 +38,14 @@ namespace GeneratePersonTest
         [Test]
         public void ShouldGenerateCorrectPin()
         {
-            var pins = new List<string>();
-
-            
             for (var x = 0; x < 100000; ++x)
             {
                 TestPerson.GenerateGender();
                 TestPerson.GenerateBirthDate(false);
                 TestPerson.GenerateSocialSecurityNumber();
 
-                pins.Add(TestPerson.SocialSecurityNumber);
-            }
-
-            foreach(var pin in pins)
-            {
-                Assert.That( FixPinFormat(pin), Is.True );
-                Assert.That( CheckPin(pin), Is.True );
+                Assert.That( FixPinFormat(TestPerson.SocialSecurityNumber), Is.True );
+                Assert.That( CheckPin(TestPerson.SocialSecurityNumber), Is.True );
             }
         }
 
@@ -103,6 +89,5 @@ namespace GeneratePersonTest
         {
             TestPerson = null;
         }
-
     }
 }

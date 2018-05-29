@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace GeneratePerson
 {
-    public class Name
+    internal class Name
     {
         private readonly Random _rnd;
 

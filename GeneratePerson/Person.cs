@@ -11,12 +11,11 @@ using System.Globalization;
 
 namespace GeneratePerson
 {
-
     public class Person : IXmlSerializable
     {
         private bool _isMale;
 
-        private Random _rnd;
+        private readonly Random _rnd;
 
         private List<string> _maleNames = new List<string>();
 
@@ -56,13 +55,7 @@ namespace GeneratePerson
         public string Email { get; private set; }
 
         [JsonProperty]
-        public string Gender
-        {
-            get
-            {
-                return (_isMale) ? "Male" : "Female";
-            }
-        }
+        public string Gender => (_isMale) ? "Male" : "Female";
 
         [JsonProperty]
         public int Age
@@ -75,13 +68,7 @@ namespace GeneratePerson
         }
 
         [JsonProperty]
-        public string FormattedName
-        {
-            get
-            {
-                return FirstName + " " + LastName;
-            }
-        }
+        public string FormattedName => FirstName + " " + LastName;
 
         private class PostCode
         {

@@ -20,6 +20,24 @@ namespace GeneratePersonTest
         }
 
         [Test]
+        public void ShouldGenerateDifferentGenders()
+        {
+            var maleCount = 0;
+            var femaleCount = 0;
+            for (int x = 0; x < 100000; ++x)
+            {
+                TestPerson.GenerateGender();
+
+                if (TestPerson.Gender == "Male")
+                    maleCount++;
+                if (TestPerson.Gender == "Female")
+                    femaleCount++;
+            }
+            Assert.That(femaleCount, Is.AtLeast(40000));
+            Assert.That(maleCount, Is.AtLeast(40000));
+        }
+
+        [Test]
         public void ShouldGeneratePersonOver18()
         {
 

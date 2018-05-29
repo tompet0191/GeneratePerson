@@ -14,46 +14,74 @@ namespace GeneratePerson
 
     public class Person : IXmlSerializable
     {
-        private bool IsMale { get; set; }
+        private bool _isMale;
 
-        private Random Rnd { get; }
+        private Random _rnd;
 
-        private List<string> _maleNames;
+        private List<string> _maleNames = new List<string>();
 
-        private List<string> _femaleNames;
+        private List<string> _femaleNames = new List<string>();
 
-        private List<string> _familyNames;
+        private List<string> _familyNames = new List<string>();
 
-        private List<PostCode> _postCodes;
+        private List<PostCode> _postCodes = new List<PostCode>();
 
-        [JsonProperty]
-        public string FirstName { get; set; }
-
-        [JsonProperty]
-        public string LastName { get; set; }
+        private readonly string _workDir;
 
         [JsonProperty]
-        public DateTime BirthDate { get; set; }
+        public string FirstName { get; private set; }
 
         [JsonProperty]
-        public string SocialSecurityNumber { get; set; }
+        public string LastName { get; private set; }
 
         [JsonProperty]
-        public string Address { get; set; }
+        public DateTime BirthDate { get; private set; }
 
         [JsonProperty]
-        public string City { get; set; }
+        public string SocialSecurityNumber { get; private set; }
 
         [JsonProperty]
-        public string Zipcode { get; set; }
+        public string Address { get; private set; }
 
         [JsonProperty]
-        public string Phone { get; set; }
+        public string City { get; private set; }
 
         [JsonProperty]
-        public string Email { get; set; }
+        public string Zipcode { get; private set; }
 
-        private string WorkDir { get; set; }
+        [JsonProperty]
+        public string Phone { get; private set; }
+
+        [JsonProperty]
+        public string Email { get; private set; }
+
+        [JsonProperty]
+        public string Gender
+        {
+            get
+            {
+                return (_isMale) ? "Male" : "Female";
+            }
+        }
+
+        [JsonProperty]
+        public int Age
+        {
+            get
+            {
+                var timeSpan = DateTime.Now - BirthDate;
+                return timeSpan.Days / 365;
+            }
+        }
+
+        [JsonProperty]
+        public string FormattedName
+        {
+            get
+            {
+                return FirstName + " " + LastName;
+            }
+        }
 
         private class PostCode
         {
@@ -63,8 +91,9 @@ namespace GeneratePerson
 
         public Person()
         {
-            WorkDir = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            Rnd = new Random();
+            _rnd = new Random();
+            _workDir = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+
             LoadJson();
 
             GenerateGender();
@@ -78,22 +107,16 @@ namespace GeneratePerson
 
         public Person(string workDir)
         {
-            Rnd = new Random();
-            WorkDir = workDir;
+            _rnd = new Random();
+            _workDir = workDir;
             LoadJson();
         }
 
-        public Person(bool? isMale)
+        public Person(bool isMale)
+            : this()
         {
-            WorkDir = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            Rnd = new Random();
 
-            if (!isMale.HasValue)
-                GenerateGender();
-            else
-                IsMale = (bool) isMale;
-            
-            LoadJson();
+            _isMale = (bool) isMale;
 
             GenerateName();
             GenerateBirthDate(false);
@@ -103,22 +126,16 @@ namespace GeneratePerson
             GenerateEmail();
         }
 
-        public Person(bool? isMale, bool? generateOver18)
+        public Person(bool? isMale, bool generateOver18)
+            : this()
         {
-            WorkDir = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            Rnd = new Random();
-            
             if (!isMale.HasValue)
                 GenerateGender();
             else
-                IsMale = (bool)isMale;
-
-            bool over18 = (!generateOver18.HasValue) ? false : (bool) generateOver18;
-
-            LoadJson();
+                _isMale = (bool)isMale;
 
             GenerateName();
-            GenerateBirthDate(over18);
+            GenerateBirthDate(generateOver18);
             GenerateSocialSecurityNumber();
             GenerateAddress();
             GeneratePhone();
@@ -127,34 +144,61 @@ namespace GeneratePerson
 
         public override string ToString()
         {
-            return "";
+            throw new NotImplementedException();
         }
 
         public void LoadJson()
         {
-            using (var r = new StreamReader(Path.Combine(WorkDir, @"..\..\lists\swedish_male_names.json")))
-            {
-                var json = r.ReadToEnd();
-                _maleNames = JsonConvert.DeserializeObject<List<string>>(json);
-            }
 
-            using (var r = new StreamReader(Path.Combine(WorkDir, @"..\..\lists\swedish_female_names.json")))
-            {
-                var json = r.ReadToEnd();
-                _femaleNames = JsonConvert.DeserializeObject<List<string>>(json);
-            }
+            #if DEBUG
+                using (var r = new StreamReader(Path.Combine(_workDir, @"..\..\lists\swedish_male_names.json")))
+                {
+                    var json = r.ReadToEnd();
+                    _maleNames = JsonConvert.DeserializeObject<List<string>>(json);
+                }
 
-            using (var r = new StreamReader(Path.Combine(WorkDir, @"..\..\lists\swedish_family_names.json")))
-            {
-                var json = r.ReadToEnd();
-                _familyNames = JsonConvert.DeserializeObject<List<string>>(json);
-            }
+                using (var r = new StreamReader(Path.Combine(_workDir, @"..\..\lists\swedish_female_names.json")))
+                {
+                    var json = r.ReadToEnd();
+                    _femaleNames = JsonConvert.DeserializeObject<List<string>>(json);
+                }
 
-            using (var r = new StreamReader(Path.Combine(WorkDir, @"..\..\lists\postcodes.json")))
-            {
-                var json = r.ReadToEnd();
-                _postCodes = JsonConvert.DeserializeObject<List<PostCode>>(json);
-            }
+                using (var r = new StreamReader(Path.Combine(_workDir, @"..\..\lists\swedish_family_names.json")))
+                {
+                    var json = r.ReadToEnd();
+                    _familyNames = JsonConvert.DeserializeObject<List<string>>(json);
+                }
+
+                using (var r = new StreamReader(Path.Combine(_workDir, @"..\..\lists\postcodes.json")))
+                {
+                    var json = r.ReadToEnd();
+                    _postCodes = JsonConvert.DeserializeObject<List<PostCode>>(json);
+                }
+            #else
+                using (var r = new StreamReader(Path.Combine(_workDir, @"lists\swedish_male_names.json")))
+                {
+                    var json = r.ReadToEnd();
+                    _maleNames = JsonConvert.DeserializeObject<List<string>>(json);
+                }
+
+                using (var r = new StreamReader(Path.Combine(_workDir, @"lists\swedish_female_names.json")))
+                {
+                    var json = r.ReadToEnd();
+                    _femaleNames = JsonConvert.DeserializeObject<List<string>>(json);
+                }
+
+                using (var r = new StreamReader(Path.Combine(_workDir, @"lists\swedish_family_names.json")))
+                {
+                    var json = r.ReadToEnd();
+                    _familyNames = JsonConvert.DeserializeObject<List<string>>(json);
+                }
+
+                using (var r = new StreamReader(Path.Combine(_workDir, @"lists\postcodes.json")))
+                {
+                    var json = r.ReadToEnd();
+                    _postCodes = JsonConvert.DeserializeObject<List<PostCode>>(json);
+                }
+            #endif
         }
 
         public string ToJson()
@@ -180,16 +224,15 @@ namespace GeneratePerson
         //sets the gender of the instance randomly
         public void GenerateGender()
         {
-            if (Rnd.Next(100) > 49)
-                IsMale = true;
+            _isMale = (_rnd.Next(0, int.MaxValue) % 2 == 0) ? true : false;            
         }
 
         //sets first and lastname of this instance randomly
         public void GenerateName()
         {
 
-            FirstName = IsMale ? _maleNames[Rnd.Next(_maleNames.Count)] : _femaleNames[Rnd.Next(_femaleNames.Count)];
-            LastName = _familyNames[Rnd.Next(_familyNames.Count)];
+            FirstName = _isMale ? _maleNames[_rnd.Next(_maleNames.Count)] : _femaleNames[_rnd.Next(_femaleNames.Count)];
+            LastName = _familyNames[_rnd.Next(_familyNames.Count)];
         }
 
         //generate random birthdate
@@ -198,20 +241,20 @@ namespace GeneratePerson
             var startDate = new DateTime(1940, 1, 1);
             var range = (over18) ? (DateTime.Today.AddYears(-18) - startDate).Days : (DateTime.Today - startDate).Days;
 
-            BirthDate = startDate.AddDays(Rnd.Next(range));
+            BirthDate = startDate.AddDays(_rnd.Next(range));
         }
 
         //generate random valid swedish socialsecuritynumber
         public void GenerateSocialSecurityNumber()
         {
-            var x = Rnd.Next(10);
-            if (IsMale && (x % 2 == 0))
+            var x = _rnd.Next(10);
+            if (_isMale && (x % 2 == 0))
                 x++;
-            else if (!IsMale && x % 2 != 0)
+            else if (!_isMale && x % 2 != 0)
                 x--;
 
             var ssno = BirthDate.Year.ToString().Substring(2, 2) + BirthDate.Month.ToString().PadLeft(2, '0') +
-                          BirthDate.Day.ToString().PadLeft(2, '0') + Rnd.Next(100).ToString().PadLeft(2, '0') + x;
+                          BirthDate.Day.ToString().PadLeft(2, '0') + _rnd.Next(100).ToString().PadLeft(2, '0') + x;
 
             var sb = new StringBuilder();
 
@@ -233,41 +276,39 @@ namespace GeneratePerson
         //generate random address
         public void GenerateAddress()
         {
-            var prefix = new string[] { "Mönster", "Drottning", "Kungs", "Ny", "Gammel", "Lingon", "Oskar", "Kulla", "Regerings", "Norrlands", "Skåne", "Dala", "Stock", "Gryning", "Hallon", "Gotlands", "Professor", "Skräddar", "Präst", "Kammar", "Kyrko", "Timmer", "Stor", "Industri", "Riddar", "Ulvsunda", "Strand", "Ankar", "Bastu", "Balders", "Biblioteks", "Brunns", "Ersta", "Guld", "Karla", "Körsbärs", "Malm", "Ring", "Stall", "Vinter" };
-            var postfix = new string[] { "stigen", "vägen", "slingan", "gatan", "gränd" };
+            var prefix = new [] { "Mönster", "Drottning", "Kungs", "Ny", "Gammel", "Lingon", "Oskar", "Kulla", "Regerings", "Norrlands", "Skåne", "Dala", "Stock", "Gryning", "Hallon", "Gotlands", "Professor", "Skräddar", "Präst", "Kammar", "Kyrko", "Timmer", "Stor", "Industri", "Riddar", "Ulvsunda", "Strand", "Ankar", "Bastu", "Balders", "Biblioteks", "Brunns", "Ersta", "Guld", "Karla", "Körsbärs", "Malm", "Ring", "Stall", "Vinter" };
+            var postfix = new [] { "stigen", "vägen", "slingan", "gatan", "gränd" };
 
-            Address = prefix[Rnd.Next(prefix.Length)] + postfix[Rnd.Next(postfix.Length)] + " " + Rnd.Next(100);
+            Address = prefix[_rnd.Next(prefix.Length)] + postfix[_rnd.Next(postfix.Length)] + " " + _rnd.Next(100);
 
             //Gets first 2 numbers in zipcode which also determines the city
-            var randPostcode = _postCodes[Rnd.Next(_postCodes.Count)];
+            var randPostcode = _postCodes[_rnd.Next(_postCodes.Count)];
             City = randPostcode.City;
             Zipcode = randPostcode.Zip;
 
             //Gets third number, for street address
-            var thirdNumber = new char[] { '2', '3', '4', '6', '7' };
-            Zipcode += thirdNumber[Rnd.Next(thirdNumber.Length)];
+            var thirdNumber = new [] { '2', '3', '4', '6', '7' };
+            Zipcode += thirdNumber[_rnd.Next(thirdNumber.Length)];
 
             //Gets final numbers
-            Zipcode += " " + Rnd.Next(100).ToString().PadLeft(2, '0'); //rand 00-99
+            Zipcode += " " + _rnd.Next(100).ToString().PadLeft(2, '0'); //rand 00-99
         }
 
         public void GeneratePhone()
         {
             //generate random phone number
-            Phone = "070-" + Rnd.Next(1000).ToString().PadLeft(3, '0') + " " + Rnd.Next(100).ToString().PadLeft(2, '0') + " " + Rnd.Next(100).ToString().PadLeft(2, '0');
+            Phone = "070-" + _rnd.Next(1000).ToString().PadLeft(3, '0') + " " + _rnd.Next(100).ToString().PadLeft(2, '0') + " " + _rnd.Next(100).ToString().PadLeft(2, '0');
         }
 
         public void GenerateEmail()
         {
+            if (FirstName == null || LastName == null)
+                throw new InvalidOperationException("Name must be set before generating e-mail.");
+
             var domains = new string[] { "whyspam.me", "trash-mail.com", "tempemail.com", "spamcowboy.com", "sendspamhere.com", "sogetthis.com", "netmails.net", "keepmymail.com", "hatespam.org", "iheartspam.org", "fastmazda.com", "discardmail.com", "10minutemail.com", "4warding.net", "deadaddress.com" };
 
             //generate random email address
-            Email = RemoveDiacretics(FirstName).Replace(" ", "") + "." + RemoveDiacretics(LastName).Replace(" ", "") + "@" + domains[Rnd.Next(domains.Length)];
-        }
-
-        protected string GetFormattedName()
-        {
-            return FirstName + " " + LastName;
+            Email = RemoveDiacretics(FirstName).Replace(" ", "") + "." + RemoveDiacretics(LastName).Replace(" ", "") + "@" + domains[_rnd.Next(domains.Length)];
         }
 
         protected string RemoveDiacretics(string s)

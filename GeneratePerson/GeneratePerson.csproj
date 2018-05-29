@@ -50,7 +50,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="lists\postcodes.json" />
     <None Include="lists\swedish_family_names.json" />
     <None Include="lists\swedish_female_names.json" />

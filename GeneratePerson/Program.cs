@@ -9,18 +9,39 @@ namespace GeneratePerson
     {
         private static void Main(string[] args)
         {
-            var p = new Person(null, false);
 
-            Console.WriteLine(p.ToFormattedJson());
+            var p = new Person();
 
-            Console.WriteLine(p.ToXml());
+            var x = 0;
+            for (int i = 0; i < 100; i++)
+            {
+                p.GenerateGender();
+                if (p.Gender == "Female")
+                    x++;
+            }
+
+            Console.WriteLine(x);
+            //var r = new Random();
+
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    Console.WriteLine(r.Next(100)); 
+            //}
+
+            //Console.WriteLine(x);
 
             
-            #if DEBUG
+
+            //Console.WriteLine(p.ToFormattedJson());
+
+            //Console.WriteLine(p.ToXml());
+
+
+           
                 Console.WriteLine();
                 Console.WriteLine("Press enter to close...");
                 Console.ReadLine();
-            #endif
+           
         }
     }
 

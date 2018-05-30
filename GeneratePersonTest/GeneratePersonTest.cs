@@ -38,6 +38,24 @@ namespace GeneratePersonTest
         }
 
         [Test]
+        public void ShouldHaveGeneratedDataForAllFields()
+        {
+            TestPerson.GenerateRandomData();
+
+            Assert.That(TestPerson.Address, Is.Not.Null.Or.Empty);
+            Assert.That(TestPerson.City, Is.Not.Null.Or.Empty);
+            Assert.That(TestPerson.Email, Is.Not.Null.Or.Empty);
+            Assert.That(TestPerson.FirstName, Is.Not.Null.Or.Empty);
+            Assert.That(TestPerson.Gender, Is.Not.Null.Or.Empty);
+            Assert.That(TestPerson.LastName, Is.Not.Null.Or.Empty);
+            Assert.That(TestPerson.Phone, Is.Not.Null.Or.Empty);
+            Assert.That(TestPerson.SocialSecurityNumber, Is.Not.Null.Or.Empty);
+            Assert.That(TestPerson.Zipcode, Is.Not.Null.Or.Empty);
+            Assert.That(TestPerson.BirthDate, Is.Not.Null.And.GreaterThanOrEqualTo(new DateTime(1910, 1, 1)));
+
+        }
+
+        [Test]
         public void ShouldGeneratePersonOver18()
         {
 

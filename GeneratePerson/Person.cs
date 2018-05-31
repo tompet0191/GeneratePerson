@@ -6,7 +6,6 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 using System.Text;
-using System.Globalization;
 
 namespace GeneratePerson
 {
@@ -184,27 +183,10 @@ namespace GeneratePerson
 
         public void GenerateEmail()
         {
-            if (FirstName == null || LastName == null)
-                throw new InvalidOperationException("Name must be set before generating e-mail.");
-
             var domains = new [] { "whyspam.me", "trash-mail.com", "tempemail.com", "spamcowboy.com", "sendspamhere.com", "sogetthis.com", "netmails.net", "keepmymail.com", "hatespam.org", "iheartspam.org", "fastmazda.com", "discardmail.com", "10minutemail.com", "4warding.net", "deadaddress.com" };
 
-            //generate random email address
-            Email = RemoveDiacretics(FirstName).Replace(" ", "") + "." + RemoveDiacretics(LastName).Replace(" ", "") + "@" + domains[_rnd.Next(domains.Length)];
-        }
-
-        protected string RemoveDiacretics(string s)
-        {
-            s = s.Normalize(NormalizationForm.FormD);
-            var sb = new StringBuilder();
-
-            foreach (var c in s)
-            {
-                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
-                    sb.Append(c);
-            }
-
-            return sb.ToString();
+            //generate random email address. note that name should always be set.
+            Email = _name.FirstNameWithoutDiacretics.Replace(" ", "") + "." + _name.LastNameWithoutDiacretics.Replace(" ", "") + "@" + domains[_rnd.Next(domains.Length)];
         }
 
         public override string ToString()

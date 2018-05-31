@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace GeneratePerson
@@ -20,6 +22,10 @@ namespace GeneratePerson
         public string LastName { get; set; }
 
         public string FormattedName => FirstName + " " + LastName;
+
+        public string FirstNameWithoutDiacretics => RemoveDiacretics(FirstName);
+
+        public string LastNameWithoutDiacretics => RemoveDiacretics(LastName);
 
         public Name(string workDir, Random rnd)
         {
@@ -48,6 +54,20 @@ namespace GeneratePerson
 
             FirstName = isMale ? _maleNames[_rnd.Next(_maleNames.Count)] : _femaleNames[_rnd.Next(_femaleNames.Count)];
             LastName = _familyNames[_rnd.Next(_familyNames.Count)];
+        }
+
+        private string RemoveDiacretics(string s)
+        {
+            s = s.Normalize(NormalizationForm.FormD);
+            var sb = new StringBuilder();
+
+            foreach (var c in s)
+            {
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                    sb.Append(c);
+            }
+
+            return sb.ToString();
         }
     }
 }

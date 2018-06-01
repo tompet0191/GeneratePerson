@@ -9,7 +9,8 @@ namespace GeneratePerson
     {
         private static void Main(string[] args)
         {
-            var p = new Person();
+            
+            var p = new Person(new Name(), new Address(), new SwedishSsnoCalculator());
             for (int i = 0; i < 10; i++)
             {
                 p.GenerateRandomData();
@@ -41,8 +42,6 @@ namespace GeneratePerson
             
 
 
-
-            Console.WriteLine();
                 Console.WriteLine("Press enter to close...");
                 Console.ReadLine();
            

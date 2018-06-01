@@ -5,7 +5,8 @@ using Newtonsoft.Json;
 
 namespace GeneratePerson
 {
-    internal class Address
+
+    public class Address : IAddress
     {
         private readonly Random _rnd;
         
@@ -17,9 +18,17 @@ namespace GeneratePerson
 
         public string City { get; private set; }
 
-        public Address(string workDir, Random rnd)
+        public Address()
         {
-            _rnd = rnd;
+            _rnd = new Random();
+
+            var json = "[ { \"Zip\": \"11\", \"City\": \"Stockholm\" }, { \"Zip\": \"21\", \"City\": \"Malmö\" }, { \"Zip\": \"22\", \"City\": \"Lund\" }, { \"Zip\": \"25\", \"City\": \"Helsingborg\" }, { \"Zip\": \"30\", \"City\": \"Halmstad\" }, { \"Zip\": \"35\", \"City\": \"Växjö\" }, { \"Zip\": \"39\", \"City\": \"Kalmar\" }, { \"Zip\": \"41\", \"City\": \"Göteborg\" }, { \"Zip\": \"50\", \"City\": \"Borås\" }, { \"Zip\": \"55\", \"City\": \"Jönköping\" }, { \"Zip\": \"58\", \"City\": \"Linköping\" }, { \"Zip\": \"60\", \"City\": \"Norrköping\" }, { \"Zip\": \"62\", \"City\": \"Gotland\" }, { \"Zip\": \"63\", \"City\": \"Eskilstuna\" }, { \"Zip\": \"65\", \"City\": \"Karlstad\" }, { \"Zip\": \"70\", \"City\": \"Örebro\" }, { \"Zip\": \"72\", \"City\": \"Västerås\" }, { \"Zip\": \"75\", \"City\": \"Uppsala\" }, { \"Zip\": \"80\", \"City\": \"Gävle\" }, { \"Zip\": \"85\", \"City\": \"Sundsvall\" }, { \"Zip\": \"90\", \"City\": \"Umeå\" }, { \"Zip\": \"97\", \"City\": \"Luleå\" } ]";
+            _postCodes = JsonConvert.DeserializeObject<List<PostCode>>(json);
+        }
+
+        public Address(string workDir)
+        {
+            _rnd = new Random();
 
             using (var r = new StreamReader(Path.Combine(workDir, @"..\..\lists\postcodes.json")))
             {

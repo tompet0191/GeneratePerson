@@ -15,7 +15,7 @@ namespace GeneratePersonTest
         [SetUp]
         public void GeneratePersonTestSetUp()
         {
-            TestPerson = new Person(TestContext.CurrentContext.WorkDirectory);
+            TestPerson = new Person(new Name(), new Address(), new SwedishSsnoCalculator(), TestContext.CurrentContext.WorkDirectory);
         }
 
         [Test]

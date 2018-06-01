@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Linq;
 using System.IO;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
-using System.Text;
 
 namespace GeneratePerson
 {
+
     public class Person : IXmlSerializable
     {
-        private readonly Address _address;
-
-        private readonly Name _name;
+        private readonly IAddress _address;
+        private readonly ISsnoCalculator _ssnoCalculator;
+        private readonly IName _name;
 
         private readonly Random _rnd;
 
@@ -23,13 +22,13 @@ namespace GeneratePerson
         public DateTime BirthDate { get; private set; }
 
         [JsonProperty]
-        public string SocialSecurityNumber { get; private set; }
-
-        [JsonProperty]
         public string Phone { get; private set; }
 
         [JsonProperty]
         public string Email { get; private set; }
+
+        [JsonProperty]
+        public string SocialSecurityNumber => _ssnoCalculator.GenerateSocialSecurityNumber(_isMale, BirthDate);
 
         [JsonProperty]
         public string FirstName => _name.FirstName;
@@ -62,45 +61,50 @@ namespace GeneratePerson
         [JsonProperty]
         public string Zipcode => _address.Zip;
 
-        public Person()
+        private Person()
+        {
+            _rnd = new Random();
+        }
+
+        public Person(IName name, IAddress address, ISsnoCalculator ssnoCalculator)
         {
             _rnd = new Random();
             var workDir = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            _address = new Address(workDir, _rnd);
-            _name = new Name(workDir, _rnd);
+            _address = address;
+            _name = name;
+            _ssnoCalculator = ssnoCalculator;
 
             GenerateGender();
             _name.GenerateName(_isMale);
             GenerateBirthDate(false);
-            GenerateSocialSecurityNumber();
+            _ssnoCalculator.GenerateSocialSecurityNumber(_isMale, BirthDate);
             _address.GenerateAddress();
             GeneratePhone();
             GenerateEmail();
         }
 
-        public Person(string workDir)
+        public Person(IName name, IAddress address, ISsnoCalculator ssnoCalculator, string workDir)
         {
             _rnd = new Random();
-            _address = new Address(workDir, _rnd);
-            _name = new Name(workDir, _rnd);
+            _address = address;
+            _name = name;
+            _ssnoCalculator = ssnoCalculator;
         }
 
-        public Person(bool isMale)
-            : this()
+        public Person(IName name, IAddress address, ISsnoCalculator ssnoCalculator, bool isMale)
+            : this(name, address, ssnoCalculator)
         {
 
-            _isMale = (bool) isMale;
+            _isMale = isMale;
 
             _name.GenerateName(_isMale);
-            _address.GenerateAddress();
-            GenerateBirthDate(false);
-            GenerateSocialSecurityNumber();
+            _ssnoCalculator.GenerateSocialSecurityNumber(_isMale, BirthDate);
             GeneratePhone();
             GenerateEmail();
         }
 
-        public Person(bool? isMale, bool generateOver18)
-            : this()
+        public Person(IName name, IAddress address, ISsnoCalculator ssnoCalculator, bool? isMale, bool generateOver18)
+            : this(name, address, ssnoCalculator)
         {
             if (!isMale.HasValue)
                 GenerateGender();
@@ -108,9 +112,8 @@ namespace GeneratePerson
                 _isMale = (bool)isMale;
 
             _name.GenerateName(_isMale);
-            _address.GenerateAddress();
             GenerateBirthDate(generateOver18);
-            GenerateSocialSecurityNumber();
+            _ssnoCalculator.GenerateSocialSecurityNumber(_isMale, BirthDate);
             GeneratePhone();
             GenerateEmail();
         }
@@ -120,7 +123,7 @@ namespace GeneratePerson
             GenerateGender();
             _name.GenerateName(_isMale);
             GenerateBirthDate(false);
-            GenerateSocialSecurityNumber();
+            _ssnoCalculator.GenerateSocialSecurityNumber(_isMale, BirthDate);
             _address.GenerateAddress();
             GeneratePhone();
             GenerateEmail();
@@ -141,38 +144,14 @@ namespace GeneratePerson
             BirthDate = startDate.AddDays(_rnd.Next(range));
         }
 
-        //generate random valid swedish socialsecuritynumber
-        public void GenerateSocialSecurityNumber()
-        {
-            var x = _rnd.Next(10);
-            if (_isMale && (x % 2 == 0))
-                x++;
-            else if (!_isMale && x % 2 != 0)
-                x--;
-
-            var ssno = BirthDate.Year.ToString().Substring(2, 2) + BirthDate.Month.ToString().PadLeft(2, '0') +
-                          BirthDate.Day.ToString().PadLeft(2, '0') + _rnd.Next(100).ToString().PadLeft(2, '0') + x;
-
-            var sb = new StringBuilder();
-
-            for (var i = 0; i < ssno.Length; ++i)
-            {
-                if (i % 2 == 0)
-                    sb.Append( ((int)char.GetNumericValue(ssno[i]) * 2).ToString() );
-                else
-                    sb.Append(ssno[i]);
-            }
-
-            var result = sb.ToString().Sum(i => (int)char.GetNumericValue(i));
-
-            ssno += ((10 - (result % 10)) % 10).ToString();
-            
-            SocialSecurityNumber = ssno;
-        }
-
         public void GenerateAddress()
         {
             _address.GenerateAddress();
+        }
+
+        public void GenerateSocialSecurityNumber()
+        {
+            _ssnoCalculator.GenerateSocialSecurityNumber(_isMale, BirthDate);
         }
 
         public void GeneratePhone()

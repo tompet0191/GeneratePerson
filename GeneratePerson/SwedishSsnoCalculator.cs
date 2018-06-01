@@ -8,13 +8,15 @@ namespace GeneratePerson
     {
         private readonly Random _rnd;
 
+        public string SocialSecurityNumber { get; set; }
+
         public SwedishSsnoCalculator()
         {
             _rnd = new Random();
         }
 
         //generate random valid swedish socialsecuritynumber
-        public string GenerateSocialSecurityNumber(bool isMale, DateTime birthDate)
+        public void GenerateSocialSecurityNumber(bool isMale, DateTime birthDate)
         {
 
             var x = _rnd.Next(10);
@@ -40,7 +42,7 @@ namespace GeneratePerson
 
             ssno += ((10 - (result % 10)) % 10).ToString();
 
-            return ssno;
+            SocialSecurityNumber = ssno;
         }
     }
 }

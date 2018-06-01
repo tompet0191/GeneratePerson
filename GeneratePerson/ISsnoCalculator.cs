@@ -4,6 +4,8 @@ namespace GeneratePerson
 {
     public interface ISsnoCalculator
     {
-        string GenerateSocialSecurityNumber(bool isMale, DateTime birthDate);
+        string SocialSecurityNumber { get; set; }
+
+        void GenerateSocialSecurityNumber(bool isMale, DateTime birthDate);
     }
 }

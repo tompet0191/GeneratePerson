@@ -28,7 +28,7 @@ namespace GeneratePerson
         public string Email { get; private set; }
 
         [JsonProperty]
-        public string SocialSecurityNumber => _ssnoCalculator.GenerateSocialSecurityNumber(_isMale, BirthDate);
+        public string SocialSecurityNumber => _ssnoCalculator.SocialSecurityNumber;
 
         [JsonProperty]
         public string FirstName => _name.FirstName;

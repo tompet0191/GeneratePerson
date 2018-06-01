@@ -12,6 +12,9 @@ namespace GeneratePersonTest
 
         public Person TestPerson { get; set; }
 
+        public SwedishSsnoCalculator TestCalculator { get; set; }
+
+
         [SetUp]
         public void GeneratePersonTestSetUp()
         {
@@ -77,6 +80,23 @@ namespace GeneratePersonTest
 
                 Assert.That(FixPINformat(TestPerson.SocialSecurityNumber), Is.True);
                 Assert.That(CheckPIN(TestPerson.SocialSecurityNumber), Is.True);
+            }
+        }
+
+        [Test]
+        public void GenerateSocialSecurityNumber_SwedishSsnoCalculator_CorrectPinForGender()
+        {
+            TestCalculator = new SwedishSsnoCalculator();
+
+            for (int i = 0; i < 100000; i++)
+            {
+                TestCalculator.GenerateSocialSecurityNumber(true, new DateTime(1970, 1, 1));
+
+                Assert.That(TestCalculator.SocialSecurityNumber[8] % 2 == 0, Is.False);
+
+                TestCalculator.GenerateSocialSecurityNumber(false, new DateTime(1970, 1, 1));
+
+                Assert.That(TestCalculator.SocialSecurityNumber[8] % 2 == 0, Is.True);
             }
         }
 

@@ -30,11 +30,19 @@ namespace GeneratePerson
         {
             _rnd = new Random();
 
-            using (var r = new StreamReader(Path.Combine(workDir, @"..\..\lists\postcodes.json")))
+            try
             {
-                var json = r.ReadToEnd();
-                _postCodes = JsonConvert.DeserializeObject<List<PostCode>>(json);
+                using (var r = new StreamReader(Path.Combine(workDir, @"..\..\lists\postcodes.json")))
+                {
+                    var json = r.ReadToEnd();
+                    _postCodes = JsonConvert.DeserializeObject<List<PostCode>>(json);
+                }
             }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("File not found");
+            }
+           
         }
 
         public void GenerateAddress()

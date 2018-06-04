@@ -74,13 +74,7 @@ namespace GeneratePerson
             _name = name;
             _ssnoCalculator = ssnoCalculator;
 
-            GenerateGender();
-            _name.GenerateName(_isMale);
-            GenerateBirthDate(false);
-            _ssnoCalculator.GenerateSocialSecurityNumber(_isMale, BirthDate);
-            _address.GenerateAddress();
-            GeneratePhone();
-            GenerateEmail();
+            GenerateRandomData();
         }
 
         public Person(IName name, IAddress address, ISsnoCalculator ssnoCalculator, string workDir)
@@ -106,10 +100,8 @@ namespace GeneratePerson
         public Person(IName name, IAddress address, ISsnoCalculator ssnoCalculator, bool? isMale, bool generateOver18)
             : this(name, address, ssnoCalculator)
         {
-            if (!isMale.HasValue)
-                GenerateGender();
-            else
-                _isMale = (bool)isMale;
+
+            _isMale = isMale ?? _rnd.Next(0, int.MaxValue) % 2 == 0; //Generate gender
 
             _name.GenerateName(_isMale);
             GenerateBirthDate(generateOver18);

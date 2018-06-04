@@ -45,23 +45,31 @@ namespace GeneratePerson
         {
             _rnd = new Random();
 
-            using (var r = new StreamReader(Path.Combine(workDir, @"..\..\lists\swedish_male_names.json")))
+            try
+            { 
+                using (var r = new StreamReader(Path.Combine(workDir, @"..\..\lists\swedish_male_names.json")))
+                {
+                    var json = r.ReadToEnd();
+                    _maleNames = JsonConvert.DeserializeObject<List<string>>(json);
+                }
+
+                using (var r = new StreamReader(Path.Combine(workDir, @"..\..\lists\swedish_female_names.json")))
+                {
+                    var json = r.ReadToEnd();
+                    _femaleNames = JsonConvert.DeserializeObject<List<string>>(json);
+                }
+
+                using (var r = new StreamReader(Path.Combine(workDir, @"..\..\lists\swedish_family_names.json")))
+                {
+                    var json = r.ReadToEnd();
+                    _familyNames = JsonConvert.DeserializeObject<List<string>>(json);
+                }
+            }
+            catch(FileNotFoundException)
             {
-                var json = r.ReadToEnd();
-                _maleNames = JsonConvert.DeserializeObject<List<string>>(json);
+                Console.WriteLine("Name file not found.");
             }
 
-            using (var r = new StreamReader(Path.Combine(workDir, @"..\..\lists\swedish_female_names.json")))
-            {
-                var json = r.ReadToEnd();
-                _femaleNames = JsonConvert.DeserializeObject<List<string>>(json);
-            }
-
-            using (var r = new StreamReader(Path.Combine(workDir, @"..\..\lists\swedish_family_names.json")))
-            {
-                var json = r.ReadToEnd();
-                _familyNames = JsonConvert.DeserializeObject<List<string>>(json);
-            }
         }
 
         public void GenerateName(bool isMale)

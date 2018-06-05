@@ -42,7 +42,7 @@ namespace GeneratePersonTest
         [Test]
         public void ShouldHaveGeneratedDataForAllFields()
         {
-            TestPerson.GenerateRandomData();
+            TestPerson.GenerateRandomData(false);
 
             Assert.That(TestPerson.Address, Is.Not.Null.Or.Empty);
             Assert.That(TestPerson.City, Is.Not.Null.Or.Empty);
@@ -90,11 +90,11 @@ namespace GeneratePersonTest
 
             for (int i = 0; i < 100000; i++)
             {
-                TestCalculator.GenerateSocialSecurityNumber(true, new DateTime(1970, 1, 1));
+                TestCalculator.GenerateSocialSecurityNumber(isMale: true, birthDate: new DateTime(1970, 1, 1));
 
                 Assert.That(TestCalculator.SocialSecurityNumber[8] % 2 == 0, Is.False);
 
-                TestCalculator.GenerateSocialSecurityNumber(false, new DateTime(1970, 1, 1));
+                TestCalculator.GenerateSocialSecurityNumber(isMale: false, birthDate: new DateTime(1970, 1, 1));
 
                 Assert.That(TestCalculator.SocialSecurityNumber[8] % 2 == 0, Is.True);
             }

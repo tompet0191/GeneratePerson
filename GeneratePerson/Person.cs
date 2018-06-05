@@ -69,12 +69,11 @@ namespace GeneratePerson
         public Person(IName name, IAddress address, ISsnoCalculator ssnoCalculator)
         {
             _rnd = new Random();
-            var workDir = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             _address = address;
             _name = name;
             _ssnoCalculator = ssnoCalculator;
 
-            GenerateRandomData();
+            GenerateRandomData(generateAgeOver18: false);
         }
 
         public Person(IName name, IAddress address, ISsnoCalculator ssnoCalculator, string workDir)
@@ -110,11 +109,11 @@ namespace GeneratePerson
             GenerateEmail();
         }
 
-        public void GenerateRandomData()
+        public void GenerateRandomData(bool generateAgeOver18)
         {
             GenerateGender();
             _name.GenerateName(_isMale);
-            GenerateBirthDate(false);
+            GenerateBirthDate(generateAgeOver18);
             _ssnoCalculator.GenerateSocialSecurityNumber(_isMale, BirthDate);
             _address.GenerateAddress();
             GeneratePhone();

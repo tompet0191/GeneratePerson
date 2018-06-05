@@ -13,7 +13,7 @@ namespace GeneratePerson
             var p = new Person(new Name(), new Address(), new SwedishSsnoCalculator());
             for (int i = 0; i < 10; i++)
             {
-                p.GenerateRandomData();
+                p.GenerateRandomData(false);
                 Console.WriteLine(p.ToFormattedJson());
                 Console.WriteLine(p.ToXml());
              

@@ -61,6 +61,7 @@ namespace GeneratePerson
         [JsonProperty]
         public string Zipcode => _address.Zip;
 
+        // A parameterless constructor is required for generating XML
         private Person()
         {
             _rnd = new Random();
@@ -100,7 +101,7 @@ namespace GeneratePerson
             : this(name, address, ssnoCalculator)
         {
 
-            _isMale = isMale ?? _rnd.Next(0, int.MaxValue) % 2 == 0; //Generate gender
+            _isMale = isMale ?? _rnd.Next(0, int.MaxValue) % 2 == 0; 
 
             _name.GenerateName(_isMale);
             GenerateBirthDate(generateOver18);
@@ -120,13 +121,11 @@ namespace GeneratePerson
             GenerateEmail();
         }
 
-        //sets the gender of the instance randomly
         public void GenerateGender()
         {
             _isMale = _rnd.Next(0, int.MaxValue) % 2 == 0;
         }
 
-        //generate random birthdate
         public void GenerateBirthDate(bool over18)
         {
             var startDate = new DateTime(1940, 1, 1);
@@ -147,7 +146,6 @@ namespace GeneratePerson
 
         public void GeneratePhone()
         {
-            //generate random phone number
             Phone = "070-" + _rnd.Next(1000).ToString().PadLeft(3, '0') + " " + _rnd.Next(100).ToString().PadLeft(2, '0') + " " + _rnd.Next(100).ToString().PadLeft(2, '0');
         }
 
@@ -155,7 +153,7 @@ namespace GeneratePerson
         {
             var domains = new [] { "whyspam.me", "trash-mail.com", "tempemail.com", "spamcowboy.com", "sendspamhere.com", "sogetthis.com", "netmails.net", "keepmymail.com", "hatespam.org", "iheartspam.org", "fastmazda.com", "discardmail.com", "10minutemail.com", "4warding.net", "deadaddress.com" };
 
-            //generate random email address. note that name should always be set.
+            //Note that name should always be set first.
             Email = _name.FirstNameWithoutDiacretics.Replace(" ", "") + "." + _name.LastNameWithoutDiacretics.Replace(" ", "") + "@" + domains[_rnd.Next(domains.Length)];
         }
 
